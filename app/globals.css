@@ -44,6 +44,15 @@ textarea {
   background-position: center center;
 }
 
+.hero-fallback {
+  background-image:
+    linear-gradient(120deg, rgba(34, 34, 34, 0.42), rgba(34, 34, 34, 0.14)),
+    var(--image-url),
+    linear-gradient(135deg, #f3ead9, #c8a96a 48%, #8f7b58);
+  background-position: center;
+  background-size: cover;
+}
+
 .ken-burns {
   animation: kenBurns 12s ease-in-out infinite alternate;
 }

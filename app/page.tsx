@@ -16,6 +16,7 @@ import {
   Mail,
   MapPin,
   Menu,
+  MessageCircle,
   Phone,
   Sparkles,
   Star,
@@ -25,6 +26,10 @@ import {
 } from "lucide-react";
 
 const image = (name: string) => `url('/images/${name}')`;
+const whatsappNumber = "251932900373";
+const receptionPhone = "+251 932 900 373";
+const bookingMessage = (message: string) =>
+  `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
 
 const clientImages = {
   exterior: "photo_2026-06-29_14-09-21.jpg",
@@ -201,11 +206,20 @@ function Reveal({
 
 export default function Home() {
   const [scrolled, setScrolled] = useState(false);
+  const [scrollProgress, setScrollProgress] = useState(0);
   const [menuOpen, setMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("home");
   const [slide, setSlide] = useState(0);
   const [lightbox, setLightbox] = useState<string | null>(null);
   const [testimonial, setTestimonial] = useState(0);
+  const [bookingOpen, setBookingOpen] = useState(false);
+  const [roomDetails, setRoomDetails] = useState<(typeof rooms)[number] | null>(null);
+  const [bookingForm, setBookingForm] = useState({
+    checkIn: "",
+    checkOut: "",
+    guests: "2 Guests",
+    roomType: "Any Room"
+  });
 
   useEffect(() => {
     heroSlides.forEach((item) => {
@@ -215,7 +229,11 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 48);
+    const onScroll = () => {
+      const scrollable = document.documentElement.scrollHeight - window.innerHeight;
+      setScrolled(window.scrollY > 48);
+      setScrollProgress(scrollable > 0 ? Math.min((window.scrollY / scrollable) * 100, 100) : 0);
+    };
     onScroll();
     window.addEventListener("scroll", onScroll);
     return () => window.removeEventListener("scroll", onScroll);
@@ -258,9 +276,26 @@ export default function Home() {
 
   const currentSlide = heroSlides[slide];
   const navTone = scrolled ? "text-charcoal" : "text-white";
+  const reservationText = `Hello ALIMAZ Pension, I would like to check room availability.
+
+Check-in: ${bookingForm.checkIn || "Not selected"}
+Check-out: ${bookingForm.checkOut || "Not selected"}
+Guests: ${bookingForm.guests}
+Room type: ${bookingForm.roomType}
+
+Please confirm availability, price, and booking details. Thank you.`;
+  const quickMessage =
+    "Hello ALIMAZ Pension, I would like to make a reservation. Please share room availability and booking details.";
 
   return (
     <main className="min-h-screen overflow-hidden bg-warmWhite text-charcoal">
+      <link rel="preload" as="image" href={`/images/${heroSlides[0].image}`} />
+      <div className="fixed inset-x-0 top-0 z-[80] h-1 bg-transparent">
+        <div
+          className="h-full bg-gold transition-[width] duration-200"
+          style={{ width: `${scrollProgress}%` }}
+        />
+      </div>
       <header className="fixed inset-x-0 top-4 z-50 px-4 md:top-6 md:px-8">
         <div
           className={`mx-auto flex max-w-7xl items-center justify-between rounded-full border px-4 py-3 transition-all duration-500 md:px-5 ${
@@ -452,7 +487,11 @@ export default function Home() {
         )}
       </AnimatePresence>
 
-      <section id="home" className="relative h-screen min-h-[720px] overflow-hidden bg-charcoal text-white">
+      <section id="home" className="relative h-screen min-h-[720px] overflow-hidden bg-softIvory text-white">
+        <div
+          className="hero-fallback absolute inset-0"
+          style={{ "--image-url": image(heroSlides[0].image) } as React.CSSProperties}
+        />
         <AnimatePresence mode="wait">
           <motion.div
             key={currentSlide.image + currentSlide.title}
@@ -551,7 +590,17 @@ export default function Home() {
                 </span>
                 <div className="flex items-center gap-3 rounded-2xl bg-softIvory px-4 py-4">
                   <CalendarDays size={18} className="text-gold" />
-                  <input type="date" className="w-full bg-transparent outline-none" />
+                  <input
+                    type="date"
+                    value={label === "Check-in" ? bookingForm.checkIn : bookingForm.checkOut}
+                    onChange={(event) =>
+                      setBookingForm((value) => ({
+                        ...value,
+                        [label === "Check-in" ? "checkIn" : "checkOut"]: event.target.value
+                      }))
+                    }
+                    className="w-full bg-transparent outline-none"
+                  />
                 </div>
               </label>
             ))}
@@ -561,7 +610,13 @@ export default function Home() {
               </span>
               <div className="flex items-center gap-3 rounded-2xl bg-softIvory px-4 py-4">
                 <Users size={18} className="text-gold" />
-                <select className="w-full bg-transparent outline-none">
+                <select
+                  value={bookingForm.guests}
+                  onChange={(event) =>
+                    setBookingForm((value) => ({ ...value, guests: event.target.value }))
+                  }
+                  className="w-full bg-transparent outline-none"
+                >
                   <option>1 Guest</option>
                   <option>2 Guests</option>
                   <option>3 Guests</option>
@@ -575,7 +630,13 @@ export default function Home() {
               </span>
               <div className="flex items-center gap-3 rounded-2xl bg-softIvory px-4 py-4">
                 <BedDouble size={18} className="text-gold" />
-                <select className="w-full bg-transparent outline-none">
+                <select
+                  value={bookingForm.roomType}
+                  onChange={(event) =>
+                    setBookingForm((value) => ({ ...value, roomType: event.target.value }))
+                  }
+                  className="w-full bg-transparent outline-none"
+                >
                   <option>Any Room</option>
                   <option>Deluxe Room</option>
                   <option>Standard Room</option>
@@ -583,7 +644,11 @@ export default function Home() {
                 </select>
               </div>
             </label>
-            <button className="mt-6 rounded-2xl bg-charcoal px-8 py-4 font-bold text-champagne transition hover:-translate-y-0.5 hover:bg-gold hover:text-charcoal lg:mt-7">
+            <button
+              type="button"
+              onClick={() => setBookingOpen(true)}
+              className="mt-6 rounded-2xl bg-charcoal px-8 py-4 font-bold text-champagne transition hover:-translate-y-0.5 hover:bg-gold hover:text-charcoal lg:mt-7"
+            >
               Check Availability
             </button>
           </div>
@@ -626,12 +691,25 @@ export default function Home() {
                       </span>
                       <span className="font-semibold">{room.price}</span>
                     </div>
-                    <a
-                      href="#booking"
-                      className="mt-6 inline-flex items-center gap-2 font-semibold text-charcoal transition hover:text-gold"
-                    >
-                      Book Now <ChevronRight size={17} />
-                    </a>
+                    <div className="mt-6 flex flex-wrap gap-3">
+                      <button
+                        type="button"
+                        onClick={() => setRoomDetails(room)}
+                        className="inline-flex items-center gap-2 font-semibold text-charcoal transition hover:text-gold"
+                      >
+                        View details <ChevronRight size={17} />
+                      </button>
+                      <a
+                        href={bookingMessage(
+                          `Hello ALIMAZ Pension, I would like to reserve the ${room.name}. Please confirm availability, price, and booking details.`
+                        )}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center gap-2 rounded-full bg-softIvory px-4 py-2 text-sm font-bold transition hover:bg-gold hover:text-charcoal"
+                      >
+                        WhatsApp <MessageCircle size={16} />
+                      </a>
+                    </div>
                   </div>
                 </article>
               </Reveal>
@@ -839,7 +917,7 @@ export default function Home() {
             </h2>
             <div className="mt-8 space-y-4 text-slate">
               <p className="flex items-center gap-3">
-                <Phone className="text-gold" size={20} /> +251 900 000 000
+                <Phone className="text-gold" size={20} /> {receptionPhone}
               </p>
               <p className="flex items-center gap-3">
                 <Mail className="text-gold" size={20} /> reservations@alimazpension.com
@@ -850,13 +928,15 @@ export default function Home() {
             </div>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <a
-                href="https://wa.me/251900000000"
+                href={bookingMessage(quickMessage)}
+                target="_blank"
+                rel="noreferrer"
                 className="rounded-full bg-charcoal px-6 py-4 text-center font-semibold text-champagne transition hover:-translate-y-0.5 hover:bg-gold hover:text-charcoal"
               >
                 WhatsApp Reservation
               </a>
               <a
-                href="tel:+251900000000"
+                href={`tel:+${whatsappNumber}`}
                 className="rounded-full bg-white px-6 py-4 text-center font-semibold transition hover:text-gold"
               >
                 Call Reception
@@ -932,7 +1012,9 @@ export default function Home() {
           <div>
             <p className="mb-4 font-semibold text-champagne">Direct Booking</p>
             <a
-              href="https://wa.me/251900000000"
+              href={bookingMessage(quickMessage)}
+              target="_blank"
+              rel="noreferrer"
               className="inline-flex rounded-full bg-champagne px-5 py-3 font-semibold text-charcoal"
             >
               Reserve on WhatsApp
@@ -957,6 +1039,141 @@ export default function Home() {
           />
         </button>
       )}
+
+      <a
+        href={bookingMessage(quickMessage)}
+        target="_blank"
+        rel="noreferrer"
+        aria-label="Reserve on WhatsApp"
+        className="fixed bottom-5 right-5 z-50 inline-flex items-center gap-3 rounded-full bg-[#1f7a45] px-5 py-4 text-sm font-bold text-white shadow-[0_18px_45px_rgba(0,0,0,0.28)] transition hover:-translate-y-1 hover:bg-[#249653] md:bottom-7 md:right-7"
+      >
+        <MessageCircle size={21} />
+        <span className="hidden sm:inline">Reserve on WhatsApp</span>
+      </a>
+
+      <AnimatePresence>
+        {bookingOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[75] grid place-items-center bg-charcoal/70 p-5 backdrop-blur-sm"
+          >
+            <motion.div
+              initial={{ opacity: 0, y: 28, scale: 0.96 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 18, scale: 0.96 }}
+              className="w-full max-w-xl rounded-[2rem] bg-warmWhite p-6 shadow-soft md:p-8"
+            >
+              <div className="mb-6 flex items-start justify-between gap-5">
+                <div>
+                  <p className="mb-2 text-xs font-bold uppercase tracking-[0.28em] text-gold">
+                    Booking Request
+                  </p>
+                  <h3 className="font-heading text-4xl">Send a clear WhatsApp message</h3>
+                </div>
+                <button
+                  type="button"
+                  aria-label="Close booking request"
+                  onClick={() => setBookingOpen(false)}
+                  className="grid size-10 shrink-0 place-items-center rounded-full border border-beige"
+                >
+                  <X size={19} />
+                </button>
+              </div>
+              <div className="rounded-2xl bg-softIvory p-5 text-sm leading-7 text-slate">
+                <p>Check-in: {bookingForm.checkIn || "Not selected"}</p>
+                <p>Check-out: {bookingForm.checkOut || "Not selected"}</p>
+                <p>Guests: {bookingForm.guests}</p>
+                <p>Room type: {bookingForm.roomType}</p>
+              </div>
+              <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+                <a
+                  href={bookingMessage(reservationText)}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="rounded-full bg-charcoal px-6 py-4 text-center font-bold text-champagne transition hover:bg-gold hover:text-charcoal"
+                >
+                  Send on WhatsApp
+                </a>
+                <button
+                  type="button"
+                  onClick={() => setBookingOpen(false)}
+                  className="rounded-full bg-white px-6 py-4 font-bold transition hover:text-gold"
+                >
+                  Edit Details
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {roomDetails && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[74] grid place-items-center bg-charcoal/70 p-5 backdrop-blur-sm"
+          >
+            <motion.div
+              initial={{ opacity: 0, y: 28, scale: 0.96 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 18, scale: 0.96 }}
+              className="grid w-full max-w-4xl overflow-hidden rounded-[2rem] bg-warmWhite shadow-soft md:grid-cols-[0.9fr_1.1fr]"
+            >
+              <div
+                className="image-fill min-h-80"
+                style={{ "--image-url": image(roomDetails.image) } as React.CSSProperties}
+              />
+              <div className="p-6 md:p-8">
+                <div className="mb-5 flex items-start justify-between gap-5">
+                  <div>
+                    <p className="mb-2 text-xs font-bold uppercase tracking-[0.28em] text-gold">
+                      Room Details
+                    </p>
+                    <h3 className="font-heading text-4xl">{roomDetails.name}</h3>
+                  </div>
+                  <button
+                    type="button"
+                    aria-label="Close room details"
+                    onClick={() => setRoomDetails(null)}
+                    className="grid size-10 shrink-0 place-items-center rounded-full border border-beige"
+                  >
+                    <X size={19} />
+                  </button>
+                </div>
+                <p className="text-lg leading-8 text-slate">{roomDetails.details}</p>
+                <div className="mt-6 grid gap-3 sm:grid-cols-2">
+                  <div className="rounded-2xl bg-softIvory p-4">
+                    <p className="text-xs font-bold uppercase tracking-[0.2em] text-slate">
+                      Occupancy
+                    </p>
+                    <p className="mt-2 font-semibold">{roomDetails.occupancy}</p>
+                  </div>
+                  <div className="rounded-2xl bg-softIvory p-4">
+                    <p className="text-xs font-bold uppercase tracking-[0.2em] text-slate">
+                      Rate
+                    </p>
+                    <p className="mt-2 font-semibold">{roomDetails.price}</p>
+                  </div>
+                </div>
+                <a
+                  href={bookingMessage(
+                    `Hello ALIMAZ Pension, I would like to reserve the ${roomDetails.name}. Please confirm availability, price, and booking requirements.`
+                  )}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="mt-7 inline-flex rounded-full bg-charcoal px-6 py-4 font-bold text-champagne transition hover:bg-gold hover:text-charcoal"
+                >
+                  Reserve this room on WhatsApp
+                </a>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </main>
   );
 }
