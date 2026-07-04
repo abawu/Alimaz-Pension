@@ -25,7 +25,9 @@ import {
   X
 } from "lucide-react";
 
-const image = (name: string) => `url('/images/${name}')`;
+const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
+const imagePath = (name: string) => `${basePath}/images/${name}`;
+const image = (name: string) => `url('${imagePath(name)}')`;
 const whatsappNumber = "251932900373";
 const receptionPhone = "+251 932 900 373";
 const bookingMessage = (message: string) =>
@@ -289,7 +291,7 @@ Please confirm availability, price, and booking details. Thank you.`;
 
   return (
     <main className="min-h-screen overflow-hidden bg-warmWhite text-charcoal">
-      <link rel="preload" as="image" href={`/images/${heroSlides[0].image}`} />
+      <link rel="preload" as="image" href={imagePath(heroSlides[0].image)} />
       <div className="fixed inset-x-0 top-0 z-[80] h-1 bg-transparent">
         <div
           className="h-full bg-gold transition-[width] duration-200"
