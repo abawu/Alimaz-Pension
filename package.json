@@ -14,7 +14,7 @@
     "@types/react-dom": "^18.3.0",
     "framer-motion": "^11.3.8",
     "lucide-react": "^0.468.0",
-    "next": "^14.2.4",
+    "next": "^14.2.35",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "swiper": "^11.1.4",
@@ -26,8 +26,5 @@
     "eslint-config-next": "^14.2.4",
     "postcss": "^8.4.39",
     "tailwindcss": "^3.4.4"
-  },
-  "optionalDependencies": {
-    "@next/swc-win32-x64-msvc": "npm:null@*"
   }
 }
