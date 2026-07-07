@@ -28,8 +28,8 @@ import {
 const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 const imagePath = (name: string) => `${basePath}/images/${name}`;
 const image = (name: string) => `url('${imagePath(name)}')`;
-const whatsappNumber = "251932900373";
-const receptionPhone = "+251 932 900 373";
+const whatsappNumber = "251910971046";
+const receptionPhone = "+251 91 097 1046";
 const bookingMessage = (message: string) =>
   `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
 
