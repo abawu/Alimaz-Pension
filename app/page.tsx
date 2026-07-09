@@ -37,7 +37,8 @@ const clientImages = {
   exterior: "photo_2026-06-29_14-09-21.jpg",
   room: "Rooms.jpg",
   wolayta: "visit wolayta.jpg",
-  culture: "visit wolayta2.jpg"
+  culture: "visit wolayta2.jpg",
+  flag: "wolaita flag.jpg"
 };
 
 const heroSlides = [
@@ -292,6 +293,7 @@ Please confirm availability, price, and booking details. Thank you.`;
   return (
     <main className="min-h-screen overflow-hidden bg-warmWhite text-charcoal">
       <link rel="preload" as="image" href={imagePath(heroSlides[0].image)} />
+      <link rel="preload" as="image" href={imagePath(clientImages.flag)} />
       <div className="fixed inset-x-0 top-0 z-[80] h-1 bg-transparent">
         <div
           className="h-full bg-gold transition-[width] duration-200"
@@ -514,6 +516,51 @@ Please confirm availability, price, and booking details. Thank you.`;
         </AnimatePresence>
         <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(10,10,10,0.74),rgba(10,10,10,0.35),rgba(10,10,10,0.18)),linear-gradient(0deg,rgba(10,10,10,0.58),transparent_45%)]" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_26%_42%,rgba(200,169,106,0.16),transparent_28%)]" />
+        {[
+          {
+            side: "left",
+            className:
+              "left-[-4.5rem] top-[18%] h-44 w-44 rotate-[-14deg] sm:h-56 sm:w-56 md:left-[-3rem] md:top-[22%] lg:h-72 lg:w-72",
+            imageClassName: "opacity-72",
+            animate: {
+              x: [-10, 18, -8],
+              y: [0, -16, 8],
+              rotate: [-14, -5, -17]
+            }
+          },
+          {
+            side: "right",
+            className:
+              "right-[-5rem] top-[22%] h-48 w-48 rotate-[12deg] sm:h-60 sm:w-60 md:right-[-3.5rem] md:top-[20%] lg:h-80 lg:w-80",
+            imageClassName: "opacity-64",
+            animate: {
+              x: [12, -20, 10],
+              y: [4, 18, -10],
+              rotate: [12, 4, 16]
+            }
+          }
+        ].map((flag) => (
+          <motion.div
+            key={flag.side}
+            aria-hidden="true"
+            initial={{ opacity: 0, scale: 0.88 }}
+            animate={{ opacity: 1, scale: 1, ...flag.animate }}
+            transition={{
+              opacity: { duration: 1.2, ease: "easeOut", delay: 0.35 },
+              scale: { duration: 1.2, ease: "easeOut", delay: 0.35 },
+              x: { duration: 11, repeat: Infinity, repeatType: "mirror", ease: "easeInOut" },
+              y: { duration: 9.5, repeat: Infinity, repeatType: "mirror", ease: "easeInOut" },
+              rotate: { duration: 12.5, repeat: Infinity, repeatType: "mirror", ease: "easeInOut" }
+            }}
+            className={`pointer-events-none absolute z-[6] hidden overflow-hidden rounded-[1.75rem] border border-white/18 bg-white/8 shadow-[0_28px_90px_rgba(0,0,0,0.34)] backdrop-blur-sm sm:block ${flag.className}`}
+          >
+            <div
+              className={`absolute inset-0 bg-cover bg-center mix-blend-screen ${flag.imageClassName}`}
+              style={{ backgroundImage: image(clientImages.flag) }}
+            />
+            <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(255,255,255,0.24),transparent_42%,rgba(0,0,0,0.18))]" />
+          </motion.div>
+        ))}
 
         <div className="relative z-10 mx-auto flex h-full max-w-7xl items-center px-5 md:px-8">
           <div className="max-w-4xl pt-20">
