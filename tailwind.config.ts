@@ -17,8 +17,8 @@ const config: Config = {
         beige: "#EAE3D6"
       },
       fontFamily: {
-        heading: ["var(--font-playfair)", "Georgia", "serif"],
-        body: ["var(--font-inter)", "Inter", "sans-serif"]
+        heading: ["var(--font-primary)", "sans-serif"],
+        body: ["var(--font-primary)", "sans-serif"]
       },
       boxShadow: {
         soft: "0 22px 60px rgba(34, 34, 34, 0.10)",

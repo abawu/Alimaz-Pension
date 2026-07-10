@@ -5,8 +5,7 @@
 :root {
   color: #222222;
   background: #faf9f6;
-  --font-inter: Inter, "Segoe UI", Arial, sans-serif;
-  --font-playfair: "Playfair Display", Georgia, "Times New Roman", serif;
+  --font-primary: var(--font-space-grotesk), "Space Grotesk", "Segoe UI", Arial, sans-serif;
 }
 
 * {
@@ -21,7 +20,7 @@ body {
   margin: 0;
   background: #faf9f6;
   color: #222222;
-  font-family: var(--font-inter), Inter, sans-serif;
+  font-family: var(--font-primary);
 }
 
 button,
